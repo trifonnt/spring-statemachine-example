@@ -18,53 +18,53 @@ import org.springframework.statemachine.listener.StateMachineListener;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.state.State;
 
-import name.trifon.example.ssm.Events;
-import name.trifon.example.ssm.States;
+import name.trifon.example.ssm.ExampleEvent;
+import name.trifon.example.ssm.ExampleState;
 
 @Configuration
 @EnableStateMachine
-public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States, Events> {
+public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<ExampleState, ExampleEvent> {
 
 	@Override
-	public void configure(StateMachineConfigurationConfigurer<States, Events> config) throws Exception {
+	public void configure(StateMachineConfigurationConfigurer<ExampleState, ExampleEvent> config) throws Exception {
 		config.withConfiguration().autoStartup(true).listener(listener());
 	}
 
 	@Override
-	public void configure(StateMachineStateConfigurer<States, Events> states) throws Exception {
+	public void configure(StateMachineStateConfigurer<ExampleState, ExampleEvent> states) throws Exception {
 		states.withStates()
-			.initial(States.SI)
-//			.states(EnumSet.allOf(States.class))
-			.state(States.S1, entryAction1(), exitAction1())
-			.state(States.S2, entryAction2(), exitAction2())
-			.state(States.S3, entryAction3(), exitAction3())
+			.initial(ExampleState.SI)
+//			.states(EnumSet.allOf(ExampleState.class))
+			.state(ExampleState.S1, entryAction1(), exitAction1())
+			.state(ExampleState.S2, entryAction2(), exitAction2())
+			.state(ExampleState.S3, entryAction3(), exitAction3())
 		;
 	}
 	@Override
-	public void configure(StateMachineTransitionConfigurer<States, Events> transitions) throws Exception {
+	public void configure(StateMachineTransitionConfigurer<ExampleState, ExampleEvent> transitions) throws Exception {
 		transitions
 		.withExternal()
-			.source(States.SI).target(States.S1)
-			.event(Events.E1)
+			.source(ExampleState.SI).target(ExampleState.S1)
+			.event(ExampleEvent.E1)
 			.guard(guard1())
 			.and()
 		.withExternal()
-			.source(States.S1).target(States.S2)
-			.event(Events.E2)
+			.source(ExampleState.S1).target(ExampleState.S2)
+			.event(ExampleEvent.E2)
 			.guard(guard2())
 			.and()
 		.withExternal()
-			.source(States.S2).target(States.S3)
-			.event(Events.E3)
+			.source(ExampleState.S2).target(ExampleState.S3)
+			.event(ExampleEvent.E3)
 //			.guardExpression("extendedState.variables.get('myvar')")
 		;
 	}
 
 	@Bean
-	public StateMachineListener<States, Events> listener() {
-		return new StateMachineListenerAdapter<States, Events>() {
+	public StateMachineListener<ExampleState, ExampleEvent> listener() {
+		return new StateMachineListenerAdapter<ExampleState, ExampleEvent>() {
 			@Override
-			public void stateChanged(State<States, Events> from, State<States, Events> to) {
+			public void stateChanged(State<ExampleState, ExampleEvent> from, State<ExampleState, ExampleEvent> to) {
 				System.out.println("State change to " + to.getId());
 			}
 		};
@@ -74,10 +74,10 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
 	//   Guards
 	// - https://docs.spring.io/spring-statemachine/docs/current/reference/#sm-guards
 	@Bean
-	public Guard<States, Events> guard1() {
-		return new Guard<States, Events>() {
+	public Guard<ExampleState, ExampleEvent> guard1() {
+		return new Guard<ExampleState, ExampleEvent>() {
 
-			public boolean evaluate(StateContext<States, Events> context) {
+			public boolean evaluate(StateContext<ExampleState, ExampleEvent> context) {
 				System.out.println("Trifon - Guard 1");
 				return true;
 			}
@@ -89,9 +89,9 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
 		return new BaseGuard();
 	}
 
-	public class BaseGuard implements Guard<States, Events> {
+	public class BaseGuard implements Guard<ExampleState, ExampleEvent> {
 
-		public boolean evaluate(StateContext<States, Events> context) {
+		public boolean evaluate(StateContext<ExampleState, ExampleEvent> context) {
 			System.out.println("Trifon - Guard 2");
 			return true;
 		}
@@ -101,46 +101,46 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
 	//   Actions
 	// - https://docs.spring.io/spring-statemachine/docs/current/reference/#sm-actions
 	@Bean
-	public Action<States, Events> entryAction1() {
-		return new Action<States, Events>() {
+	public Action<ExampleState, ExampleEvent> entryAction1() {
+		return new Action<ExampleState, ExampleEvent>() {
 
-			public void execute(StateContext<States, Events> context) {
+			public void execute(StateContext<ExampleState, ExampleEvent> context) {
 				System.out.println("TRIFON - Entry action1()");
 			}
 		};
 	}
 
 	@Bean
-	public Action<States, Events> entryAction2() {
+	public Action<ExampleState, ExampleEvent> entryAction2() {
 		return entryAction("2");
 	}
 	@Bean
-	public Action<States, Events> entryAction3() {
+	public Action<ExampleState, ExampleEvent> entryAction3() {
 		return entryAction("3");
 	}
-	public Action<States, Events> entryAction(final String name) {
-		return new Action<States, Events>() {
+	public Action<ExampleState, ExampleEvent> entryAction(final String name) {
+		return new Action<ExampleState, ExampleEvent>() {
 
-			public void execute(StateContext<States, Events> context) {
+			public void execute(StateContext<ExampleState, ExampleEvent> context) {
 				System.out.println("TRIFON - Entry action"+name+"()");
 			}
 		};
 	}
 
-	public Action<States, Events> exitAction(final String name) {
-		return new Action<States, Events>() {
+	public Action<ExampleState, ExampleEvent> exitAction(final String name) {
+		return new Action<ExampleState, ExampleEvent>() {
 
-			public void execute(StateContext<States, Events> context) {
+			public void execute(StateContext<ExampleState, ExampleEvent> context) {
 				System.out.println("TRIFON - Exit action"+name+"()");
 			}
 		};
 	}
 	@Bean
-	public Action<States, Events> exitAction1() {
+	public Action<ExampleState, ExampleEvent> exitAction1() {
 		return exitAction("1");
 	}
 	@Bean
-	public Action<States, Events> exitAction2() {
+	public Action<ExampleState, ExampleEvent> exitAction2() {
 		return exitAction("2");
 	}
 
@@ -156,14 +156,14 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
 			parser.parseExpression("stateMachine.sendEvent(T(name.trifon.example.ssm.Events).E2)"));
 	}
 
-	public class BaseAction implements Action<States, Events> {
+	public class BaseAction implements Action<ExampleState, ExampleEvent> {
 
-		public void execute(StateContext<States, Events> context) {
+		public void execute(StateContext<ExampleState, ExampleEvent> context) {
 			System.out.println("TRIFON - baseAction()");
 		}
 	}
 
-	public class SpelAction extends SpelExpressionAction<States, Events> {
+	public class SpelAction extends SpelExpressionAction<ExampleState, ExampleEvent> {
 
 		public SpelAction(Expression expression) {
 			super(expression);
